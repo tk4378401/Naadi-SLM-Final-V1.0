@@ -87,7 +87,7 @@ void IRAM_ATTR timer_callback(void* arg) {
 void init_adc() {
     // Configure ADC1 / ADC1 कॉन्फ़िगर करें
     adc1_config_width(ADC_WIDTH_BIT_12);
-    adc1_config_channel_atten((adc1_channel_t)ADC_PIN, ADC_ATTEN_DB_11);
+    adc1_config_channel_atten((adc1_channel_t)ADC_PIN, ADC_ATTEN_DB_12);
     
     Serial.println("ADC initialized on GPIO 34");
     Serial.println("GPIO 34 पर ADC आरंभ किया गया");
@@ -101,7 +101,7 @@ void init_timer() {
     esp_timer_create_args_t timer_args = {
         .callback = &timer_callback,
         .arg = NULL,
-        .dispatch_method = esp_timer_dispatch_t::ESP_TIMER_ISR,
+        .dispatch_method = ESP_TIMER_TASK,
         .name = "sampling_timer"
     };
     
