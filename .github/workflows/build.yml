@@ -1,1 +1,113 @@
+# File: .github/workflows/build.yml
+# GitHub Actions CI/CD Pipeline for Ayurvedic Nadi Pariksha
+# आयुर्वेदिक नाडी परीक्षा के लिए GitHub Actions CI/CD पाइपलाइन
+#
+# CRITICAL: Uses latest GitHub Actions versions to avoid Node.js 20 deprecation warnings
+# महत्वपूर्ण: Node.js 20 बहिष्करण चेतावनियों से बचने के लिए नवीनतम GitHub Actions संस्करणों का उपयोग करता है
+# - actions/checkout@v5
+# - actions/setup-python@v6
+# - actions/upload-artifact@v5
 
+name: Build Nadi Pariksha Artifacts
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  # ============================================
+  # Job 1: Build Windows EXE Files
+  # जॉब 1: Windows EXE फ़ाइलें बनाएं
+  # ============================================
+  build-windows-exe:
+    runs-on: windows-latest
+    
+    steps:
+      # CRITICAL: Use actions/checkout@v5 (latest version)
+      # महत्वपूर्ण: actions/checkout@v5 का उपयोग करें (नवीनतम संस्करण)
+      - name: Checkout code / कोड चेकआउट करें
+        uses: actions/checkout@v5
+      
+      # CRITICAL: Use actions/setup-python@v6 (latest version)
+      # महत्वपूर्ण: actions/setup-python@v6 का उपयोग करें (नवीनतम संस्करण)
+      - name: Set up Python / Python सेट करें
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies / निर्भरताएं स्थापित करें
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Build NadiMonitor.exe / NadiMonitor.exe बनाएं
+        run: |
+          pyinstaller --onefile --windowed --name NadiMonitor Nadi_Monitor.py
+      
+      - name: Build NadiGenerator.exe / NadiGenerator.exe बनाएं
+        run: |
+          pyinstaller --onefile --windowed --name NadiGenerator Nadi_Generator.py
+      
+      # CRITICAL: Use actions/upload-artifact@v5 (latest version)
+      # महत्वपूर्ण: actions/upload-artifact@v5 का उपयोग करें (नवीनतम संस्करण)
+      - name: Upload NadiMonitor.exe / NadiMonitor.exe अपलोड करें
+        uses: actions/upload-artifact@v5
+        with:
+          name: NadiMonitor-windows
+          path: dist/NadiMonitor.exe
+          retention-days: 30
+      
+      - name: Upload NadiGenerator.exe / NadiGenerator.exe अपलोड करें
+        uses: actions/upload-artifact@v5
+        with:
+          name: NadiGenerator-windows
+          path: dist/NadiGenerator.exe
+          retention-days: 30
+
+  # ============================================
+  # Job 2: Build ESP32 Firmware .bin Files
+  # जॉब 2: ESP32 फ़र्मवेयर .bin फ़ाइलें बनाएं
+  # ============================================
+  build-esp32-bin:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # CRITICAL: Use actions/checkout@v5 (latest version)
+      # महत्वपूर्ण: actions/checkout@v5 का उपयोग करें (नवीनतम संस्करण)
+      - name: Checkout code / कोड चेकआउट करें
+        uses: actions/checkout@v5
+      
+      # Install PlatformIO / PlatformIO स्थापित करें
+      - name: Install PlatformIO / PlatformIO स्थापित करें
+        run: |
+          pip install platformio
+      
+      # Build virtual environment firmware / वर्चुअल वातावरण फ़र्मवेयर बनाएं
+      - name: Build virtual firmware / वर्चुअल फ़र्मवेयर बनाएं
+        run: |
+          pio run -e virtual
+      
+      # Build hardware environment firmware / हार्डवेयर वातावरण फ़र्मवेयर बनाएं
+      - name: Build hardware firmware / हार्डवेयर फ़र्मवेयर बनाएं
+        run: |
+          pio run -e hardware
+      
+      # CRITICAL: Use actions/upload-artifact@v5 (latest version)
+      # महत्वपूर्ण: actions/upload-artifact@v5 का उपयोग करें (नवीनतम संस्करण)
+      - name: Upload virtual firmware .bin / वर्चुअल फ़र्मवेयर .bin अपलोड करें
+        uses: actions/upload-artifact@v5
+        with:
+          name: esp32-virtual-firmware
+          path: .pio/build/virtual/firmware.bin
+          retention-days: 30
+      
+      - name: Upload hardware firmware .bin / हार्डवेयर फ़र्मवेयर .bin अपलोड करें
+        uses: actions/upload-artifact@v5
+        with:
+          name: esp32-hardware-firmware
+          path: .pio/build/hardware/firmware.bin
+          retention-days: 30
