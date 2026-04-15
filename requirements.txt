@@ -1,0 +1,18 @@
+# File: requirements.txt
+# Python Dependencies for Ayurvedic Nadi Pariksha
+# आयुर्वेदिक नाडी परीक्षा के लिए Python निर्भरताएं
+
+# Numerical computing / संख्यात्मक गणना
+numpy>=1.24.0
+
+# Scientific computing and signal processing / वैज्ञानिक गणना और संकेत प्रसंस्करण
+scipy>=1.10.0
+
+# PyQt6 GUI framework / PyQt6 GUI फ्रेमवर्क
+PyQt6>=6.4.0
+
+# Real-time plotting library / रियल-टाइम प्लॉटिंग लाइब्रेरी
+pyqtgraph>=0.13.0
+
+# PyInstaller for creating standalone EXE files / स्टैंडअलोन EXE फ़ाइलें बनाने के लिए PyInstaller
+pyinstaller>=5.13.0
